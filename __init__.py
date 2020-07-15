@@ -3,7 +3,7 @@
 ### edited: mseewer
 
 from adapt.intent import IntentBuilder
-from mycroft.skills.core import MycroftSkill, intent_handler
+from mycroft.skills.core import MycroftSkill, intent_handler, intent_file_handler
 from mycroft.util.log import LOG
 from mycroft.util.parse import match_one
 import requests
