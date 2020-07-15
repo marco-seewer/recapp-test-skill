@@ -19,14 +19,14 @@ class ButtonValidator:
 
 
 
-class RecappTest(MycroftSkill):
+class RecappSkill(MycroftSkill):
     button_match_threshold = 0.6
     button_attempts_max = 3
 
 
     # The constructor of the skill, which calls MycroftSkill's constructor
     def __init__(self):
-        super(RecappTest, self).__init__(name="RecappTest")
+        super(RecappSkill, self).__init__(name="RecappSkill")
         self.conversation_active = False
         self.rasa_host = "http://localhost:5005/"
         self.append_endpoint = (
@@ -44,7 +44,7 @@ class RecappTest(MycroftSkill):
 #    @intent_handler(IntentBuilder("").require("Chatwithrasa"))
     @intent_file_handler('test.recapp.intent')
     def handle_talk_to_rasa_intent(self, message):
-        response = self.get_response("connecting.to.rasa")
+        response = self.get_response("connecting.to.recapp")
         self.conversation_active = True
         while response is not None and self.conversation_active:
             messages = self.get_rasa_response(response)
@@ -52,17 +52,17 @@ class RecappTest(MycroftSkill):
                 for rasa_message in messages[:-1]:
                     self.speak(rasa_message)
             if len(messages) == 0:
-                messages = ["no response from rasa"]
+                messages = ["keine antwort von rasa"]
             response = self.handle_final_output(messages[-1])
 
-        self.speak("disconnecting from rasa")
+        self.speak("von rasa trennen")
 
 
     def handle_final_output(self, message, attempts=0):
         if attempts > self.button_attempts_max:
             return None
         if attempts > 0:
-            self.speak("You can also say Option 1, Option 2, etc")
+            self.speak("Du kannst auch Option 1, Option 2, und so weiter sagen")
         # if we have buttons, handle them
         if "buttons" in message:
             # speak the text on the message
@@ -73,14 +73,14 @@ class RecappTest(MycroftSkill):
 
             if len(buttons) == 1:
                 # if we have a single button, assume it's a confirmation
-                self.speak("To confirm, say")
+                self.speak("Zum Bestätigen sage")
             elif len(buttons) > 1:
                 # if we have many buttons, list the options
-                self.speak("You can say")
+                self.speak("Du kannst sagen")
             # read out our button title options, separated by "Or"
             for button in buttons[:-1]:
                 self.speak(button["title"])
-                self.speak("Or")
+                self.speak("Oder")
             # read the final button option, and await a response
             # that is in the list of what we just returned OR
             # is "option 1", "option 2", ..., "option N"  N
@@ -111,12 +111,12 @@ class RecappTest(MycroftSkill):
         return self.get_response(message["text"], num_retries=0)
 
     def on_failed_button(self, utt):
-        return "Sorry I didn't catch that."
+        return "Entschuldigung ich habe nicht verstanden."
 
     def get_rasa_response(self, utterance):
         if "stop" in utterance.lower():
             self.conversation_active = False
-            return [{"text": "goodbye from rasa"}]
+            return [{"text": "Auf Wiedersehen von Rasa"}]
         messages = self.hit_rasa(utterance)
         print(messages)
         return messages
@@ -149,5 +149,5 @@ class RecappTest(MycroftSkill):
 
 
 def create_skill():
-    return RecappTest()
+    return RecappSkill()
 
